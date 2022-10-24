@@ -3799,6 +3799,10 @@ int bt_disable(void)
 	bt_conn_cleanup_all();
 	disconnected_handles_reset();
 #endif /* CONFIG_BT_CONN */
+
+	err = bt_id_delete_all();
+	BT_ASSERT(err == 0);
+
 	/* Clear BT_DEV_ENABLE here to prevent early bt_enable() calls, before disable is
 	 * completed.
 	 */
