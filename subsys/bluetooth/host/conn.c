@@ -3001,9 +3001,12 @@ int bt_conn_init(void)
 {
 	int err, i;
 
+	k_fifo_init(&free_tx);
 	for (i = 0; i < ARRAY_SIZE(conn_tx); i++) {
 		k_fifo_put(&free_tx, &conn_tx[i]);
 	}
+
+	bt_l2cap_init();
 
 	bt_att_init();
 
@@ -3011,8 +3014,6 @@ int bt_conn_init(void)
 	if (err) {
 		return err;
 	}
-
-	bt_l2cap_init();
 
 	/* Initialize background scan */
 	if (IS_ENABLED(CONFIG_BT_CENTRAL)) {
