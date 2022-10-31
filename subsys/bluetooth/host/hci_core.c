@@ -1742,6 +1742,10 @@ int bt_unpair(uint8_t id, const bt_addr_le_t *addr)
 		return 0;
 	}
 
+	if (!addr) {
+		addr = BT_ADDR_LE_ANY;
+	}
+
 	unpair(id, addr);
 	return 0;
 }
@@ -3800,6 +3804,10 @@ int bt_disable(void)
 	bt_conn_cleanup_all();
 	disconnected_handles_reset();
 #endif /* CONFIG_BT_CONN */
+
+	err = bt_id_delete_all();
+	BT_ASSERT(err == 0);
+
 	/* Clear BT_DEV_ENABLE here to prevent early bt_enable() calls, before disable is
 	 * completed.
 	 */

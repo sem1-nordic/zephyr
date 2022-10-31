@@ -1320,12 +1320,8 @@ int bt_id_reset(uint8_t id, bt_addr_le_t *addr, uint8_t *irk)
 	return id;
 }
 
-int bt_id_delete(uint8_t id)
+static int id_delete(uint8_t id)
 {
-	if (id == BT_ID_DEFAULT || id >= bt_dev.id_count) {
-		return -EINVAL;
-	}
-
 	if (bt_addr_le_eq(&bt_dev.id_addr[id], BT_ADDR_LE_ANY)) {
 		return -EALREADY;
 	}
@@ -1364,6 +1360,32 @@ int bt_id_delete(uint8_t id)
 	    atomic_test_bit(bt_dev.flags, BT_DEV_READY)) {
 		bt_settings_save_id();
 	}
+
+	return 0;
+}
+
+
+int bt_id_delete(uint8_t id)
+{
+	if (id == BT_ID_DEFAULT || id >= bt_dev.id_count) {
+		return -EINVAL;
+	}
+
+	return id_delete(id);
+}
+
+int bt_id_delete_all(void)
+{
+	for (uint8_t id = 0U; id < bt_dev.id_count; id++) {
+		int err;
+
+		err = id_delete(id);
+		if (err != -EALREADY) {
+			return err;
+		}
+	}
+
+	bt_dev.id_count = 0;
 
 	return 0;
 }
